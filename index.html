@@ -244,17 +244,130 @@
 
         .close-game {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 10px;
+            right: 10px;
             background: none;
             border: none;
-            font-size: 28px;
+            font-size: 32px;
             cursor: pointer;
             color: #999;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
         }
 
         .close-game:hover {
             color: #333;
+        }
+
+        .game-menu {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            text-align: center;
+        }
+
+        .game-menu.show {
+            display: flex;
+        }
+
+        .game-menu h1 {
+            color: #667eea;
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .menu-btn {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .menu-btn:hover {
+            background-color: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .difficulty-menu {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .difficulty-menu.show {
+            display: flex;
+        }
+
+        .difficulty-menu h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .difficulty-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .difficulty-option {
+            padding: 12px 20px;
+            font-size: 1em;
+            background-color: #f0f0f0;
+            color: #333;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+
+        .difficulty-option:hover {
+            background-color: #e0e0e0;
+            border-color: #667eea;
+        }
+
+        .difficulty-option.selected {
+            background-color: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .back-btn {
+            margin-top: 20px;
+            padding: 10px 25px;
+            font-size: 0.95em;
+            background-color: #ddd;
+            color: #333;
+        }
+
+        .back-btn:hover {
+            background-color: #ccc;
+            box-shadow: none;
+            transform: none;
         }
 
         .mobile-controls {
@@ -297,6 +410,158 @@
         .control-btn.left { grid-column: 1; grid-row: 2; }
         .control-btn.down { grid-column: 2; grid-row: 2; }
         .control-btn.right { grid-column: 3; grid-row: 2; }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .difficulty-btn {
+            padding: 10px 20px;
+            font-size: 0.95em;
+            background-color: #f0f0f0;
+            color: #333;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .difficulty-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .difficulty-btn.active {
+            background-color: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            text-align: center;
+        }
+
+        .game-container h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+
+        .score, .high-score {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .controls {
+            color: #666;
+            font-size: 0.9em;
+            margin: 10px 0;
+        }
+
+        .controls p {
+            margin: 5px 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .button-group button {
+            padding: 12px 30px;
+            font-size: 1em;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .button-group button:hover {
+            background-color: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .game-over {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1002;
+        }
+
+        .game-over.show {
+            display: flex;
+        }
+
+        .game-over-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+        }
+
+        .game-over h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .final-score {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .game-over button {
+            padding: 12px 40px;
+            font-size: 1.1em;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .game-over button:hover {
+            background-color: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
 
         @media (max-width: 640px) {
             .logo {
@@ -431,16 +696,45 @@
     <div class="game-modal" id="gameModal">
         <div class="game-modal-content">
             <button class="close-game" onclick="closeGameModal()">✕</button>
-            <div class="game-container">
+            
+            <!-- Game Menu -->
+            <div class="game-menu show" id="gameMenu">
+                <h1>🐍 Snake Game</h1>
+                <div style="font-size: 1.2em; color: #667eea; margin: 20px 0; font-weight: bold;">
+                    🏆 High Score: <span id="highScoreDisplay">0</span>
+                </div>
+                <div class="menu-buttons">
+                    <button class="menu-btn" onclick="startGameFromMenu()">▶ Play</button>
+                    <button class="menu-btn" onclick="showSettingsMenu()">🎨 Skins</button>
+                </div>
+            </div>
+
+            <!-- Difficulty Settings Menu -->
+            <div class="difficulty-menu" id="difficultyMenu">
+                <h2>Choose a Skin</h2>
+                <div class="difficulty-options">
+                    <button class="difficulty-option selected" onclick="setDifficultyAndBack('easy')">🐍 Rainbow</button>
+                    <button class="difficulty-option" onclick="setDifficultyAndBack('medium')">💚 Green</button>
+                    <button class="difficulty-option" onclick="setDifficultyAndBack('hard')">🔵 Blue</button>
+                </div>
+                <button class="menu-btn back-btn" onclick="backToMainMenu()">← Back</button>
+            </div>
+
+            <div class="game-container" id="gameContainer" style="display: none;">
                 <h1>🐍 Snake Game</h1>
                 <div class="info">
                     <div class="score">Score: <span id="score">0</span></div>
                     <div class="high-score">High Score: <span id="highScore">0</span></div>
                 </div>
-                <canvas id="gameCanvas" width="400" height="400"></canvas>
+                <canvas id="gameCanvas" width="420" height="420"></canvas>
                 <div class="controls">
                     <p>Use Arrow Keys or WASD to move</p>
                     <p>Press Space to pause/resume</p>
+                </div>
+                <div class="difficulty-selector">
+                    <button class="difficulty-btn active" onclick="setDifficulty('easy')">Easy</button>
+                    <button class="difficulty-btn" onclick="setDifficulty('medium')">Medium</button>
+                    <button class="difficulty-btn" onclick="setDifficulty('hard')">Hard</button>
                 </div>
                 <div class="button-group">
                     <button id="startBtn">Start Game</button>
@@ -458,17 +752,61 @@
                 <div class="game-over-content">
                     <h2>Game Over!</h2>
                     <div class="final-score">Final Score: <span id="finalScore">0</span></div>
-                    <button onclick="location.reload()">Play Again</button>
+                    <button onclick="returnToMainMenu()">Play Again</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Menu Functions
+        function startGameFromMenu() {
+            document.getElementById('gameMenu').classList.remove('show');
+            document.getElementById('gameContainer').style.display = 'block';
+            initializeGame();
+            startGame();
+        }
+
+        function showSettingsMenu() {
+            document.getElementById('gameMenu').classList.remove('show');
+            document.getElementById('difficultyMenu').classList.add('show');
+        }
+
+        function backToMainMenu() {
+            document.getElementById('difficultyMenu').classList.remove('show');
+            document.getElementById('gameMenu').classList.add('show');
+        }
+
+        function returnToMainMenu() {
+            if (gameRunning) {
+                endGame();
+            }
+            document.getElementById('gameContainer').style.display = 'none';
+            document.getElementById('gameOver').classList.remove('show');
+            document.getElementById('gameMenu').classList.add('show');
+        }
+
+        function setDifficultyAndBack(level) {
+            difficulty = level;
+            // Update button styling
+            document.querySelectorAll('.difficulty-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // Brief delay then back to menu
+            setTimeout(() => {
+                backToMainMenu();
+            }, 300);
+        }
+
         // Game Modal Functions
         function openGameModal() {
             document.getElementById('gameModal').classList.add('show');
-            initializeGame();
+            // Update high score display
+            document.getElementById('highScoreDisplay').textContent = highScore;
+            // Hide game over overlay when opening modal
+            document.getElementById('gameOver').classList.remove('show');
         }
 
         function closeGameModal() {
@@ -476,6 +814,11 @@
             if (gameRunning) {
                 endGame();
             }
+            // Reset menu when closing
+            document.getElementById('gameContainer').style.display = 'none';
+            document.getElementById('gameMenu').classList.add('show');
+            document.getElementById('difficultyMenu').classList.remove('show');
+            document.getElementById('gameOver').classList.remove('show');
         }
 
         // Close modal when clicking outside content
@@ -490,7 +833,7 @@
         let gameVariablesInitialized = false;
 
         // Game variables
-        const gridSize = 20;
+        const gridSize = 30;
         let tileCount;
         let snake = [{ x: 10, y: 10 }];
         let food = { x: 15, y: 15 };
@@ -501,6 +844,16 @@
         let gamePaused = false;
         let gameLoopId = null;
         let highScore = localStorage.getItem('snakeHighScore') || 0;
+        let difficulty = 'easy';
+        let gameFrameCount = 0;
+        let smileFrames = 0;
+        
+        // Difficulty speeds (in milliseconds)
+        const difficultySettings = {
+            easy: 150,
+            medium: 100,
+            hard: 60
+        };
 
         function initializeGame() {
             if (!gameVariablesInitialized) {
@@ -521,23 +874,18 @@
             draw();
         }
 
-        // Mobile touch controls
-        function handleMobileMove(direction) {
-            if (!gameRunning && !gamePaused) return;
+        function setDifficulty(level) {
+            difficulty = level;
+            // Update button styling
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
             
-            switch(direction) {
-                case 'up':
-                    if (nextDirection.y === 0) nextDirection = { x: 0, y: -1 };
-                    break;
-                case 'down':
-                    if (nextDirection.y === 0) nextDirection = { x: 0, y: 1 };
-                    break;
-                case 'left':
-                    if (nextDirection.x === 0) nextDirection = { x: -1, y: 0 };
-                    break;
-                case 'right':
-                    if (nextDirection.x === 0) nextDirection = { x: 1, y: 0 };
-                    break;
+            // Restart game with new difficulty
+            if (gameRunning) {
+                clearInterval(gameLoopId);
+                gameLoopId = setInterval(gameLoop, difficultySettings[difficulty]);
             }
         }
 
@@ -559,12 +907,15 @@
         function draw() {
             if (!canvas) return;
             
-            // Clear canvas
-            ctx.fillStyle = '#000';
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // Draw grid (optional - light grid)
-            ctx.strokeStyle = '#111';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
             ctx.lineWidth = 0.5;
             for (let i = 0; i <= tileCount; i++) {
                 ctx.beginPath();
@@ -578,40 +929,240 @@
                 ctx.stroke();
             }
 
-            // Draw snake
+            // Draw snake with smooth rainbow gradient
+            function hslToRgb(h, s, l) {
+                const a = s * Math.min(l, 1 - l);
+                const f = n => {
+                    const k = (n + h / 30) % 12;
+                    return l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                };
+                return `rgb(${Math.round(f(0) * 255)}, ${Math.round(f(8) * 255)}, ${Math.round(f(4) * 255)})`;
+            }
+            
             snake.forEach((segment, index) => {
+                // Calculate rainbow hue based on position in snake (0-360)
+                const hue = (index / snake.length * 360) % 360;
+                
                 if (index === 0) {
-                    // Head
-                    ctx.fillStyle = '#4CAF50';
-                    ctx.shadowColor = '#2E7D32';
-                    ctx.shadowBlur = 10;
-                } else {
-                    // Body
-                    ctx.fillStyle = '#66BB6A';
+                    // Head - bright color with rounded corners
+                    ctx.fillStyle = hslToRgb(hue, 1, 0.5);
+                    ctx.shadowColor = hslToRgb(hue, 1, 0.3);
+                    ctx.shadowBlur = 15;
+                    const headX = segment.x * gridSize + 1;
+                    const headY = segment.y * gridSize + 1;
+                    const headW = gridSize - 2;
+                    const headH = gridSize - 2;
+                    const radius = 6;
+                    
+                    // Draw rounded rectangle for head
+                    ctx.beginPath();
+                    ctx.moveTo(headX + radius, headY);
+                    ctx.lineTo(headX + headW - radius, headY);
+                    ctx.quadraticCurveTo(headX + headW, headY, headX + headW, headY + radius);
+                    ctx.lineTo(headX + headW, headY + headH - radius);
+                    ctx.quadraticCurveTo(headX + headW, headY + headH, headX + headW - radius, headY + headH);
+                    ctx.lineTo(headX + radius, headY + headH);
+                    ctx.quadraticCurveTo(headX, headY + headH, headX, headY + headH - radius);
+                    ctx.lineTo(headX, headY + radius);
+                    ctx.quadraticCurveTo(headX, headY, headX + radius, headY);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Add highlight to head
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                    ctx.beginPath();
+                    ctx.arc(headX + 6, headY + 6, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Draw border
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(headX + radius, headY);
+                    ctx.lineTo(headX + headW - radius, headY);
+                    ctx.quadraticCurveTo(headX + headW, headY, headX + headW, headY + radius);
+                    ctx.lineTo(headX + headW, headY + headH - radius);
+                    ctx.quadraticCurveTo(headX + headW, headY + headH, headX + headW - radius, headY + headH);
+                    ctx.lineTo(headX + radius, headY + headH);
+                    ctx.quadraticCurveTo(headX, headY + headH, headX, headY + headH - radius);
+                    ctx.lineTo(headX, headY + radius);
+                    ctx.quadraticCurveTo(headX, headY, headX + radius, headY);
+                    ctx.closePath();
+                    ctx.stroke();
+                    
+                    // Draw detailed eyes on head - eyes extend outside tile
+                    const headCenterX = segment.x * gridSize + gridSize / 2;
+                    const headCenterY = segment.y * gridSize + gridSize / 2;
+                    const eyeRadius = 6;
+                    const pupilRadius = 3;
+                    
+                    // Add bobble effect to eyes based on frame count
+                    const bobbleAmount = Math.sin(gameFrameCount * 0.1) * 2;
+                    
+                    // Draw white eye backgrounds - larger eyes that extend outside
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                    ctx.shadowBlur = 8;
+                    
+                    let eye1X, eye1Y, eye2X, eye2Y;
+                    
+                    // Position eyes based on direction - extend beyond tile with bobble
+                    if (direction.x === 1) { // Moving right
+                        eye1X = headCenterX + 18;
+                        eye1Y = headCenterY - 8 + bobbleAmount;
+                        eye2X = headCenterX + 18;
+                        eye2Y = headCenterY + 8 - bobbleAmount;
+                    } else if (direction.x === -1) { // Moving left
+                        eye1X = headCenterX - 18;
+                        eye1Y = headCenterY - 8 + bobbleAmount;
+                        eye2X = headCenterX - 18;
+                        eye2Y = headCenterY + 8 - bobbleAmount;
+                    } else if (direction.y === -1) { // Moving up
+                        eye1X = headCenterX - 8 + bobbleAmount;
+                        eye1Y = headCenterY - 18;
+                        eye2X = headCenterX + 8 - bobbleAmount;
+                        eye2Y = headCenterY - 18;
+                    } else if (direction.y === 1) { // Moving down
+                        eye1X = headCenterX - 8 + bobbleAmount;
+                        eye1Y = headCenterY + 18;
+                        eye2X = headCenterX + 8 - bobbleAmount;
+                        eye2Y = headCenterY + 18;
+                    }
+                    
+                    // Draw eyes
+                    ctx.beginPath();
+                    ctx.arc(eye1X, eye1Y, eyeRadius, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.beginPath();
+                    ctx.arc(eye2X, eye2Y, eyeRadius, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Draw pupils
+                    ctx.fillStyle = '#000000';
                     ctx.shadowColor = 'transparent';
+                    
+                    // If eating an apple, draw happy closed eyes instead
+                    if (smileFrames > 0) {
+                        ctx.beginPath();
+                        ctx.arc(eye1X, eye1Y, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        ctx.beginPath();
+                        ctx.arc(eye2X, eye2Y, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        // Normal pupils
+                        ctx.beginPath();
+                        ctx.arc(eye1X, eye1Y, pupilRadius, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        ctx.beginPath();
+                        ctx.arc(eye2X, eye2Y, pupilRadius, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Draw eye shine/glint (only when not eating)
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.beginPath();
+                        ctx.arc(eye1X - 1.5, eye1Y - 1.5, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        ctx.beginPath();
+                        ctx.arc(eye2X - 1.5, eye2Y - 1.5, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    
+                    // Draw mouth/smile
+                    ctx.strokeStyle = '#FF1744';
+                    ctx.lineWidth = 3;
+                    ctx.lineCap = 'round';
+                    
+                    // Make smile bigger and more expressive when eating
+                    const smileScale = smileFrames > 0 ? 1.5 : 1;
+                    const smileRadius = 5 * smileScale;
+                    
+                    if (direction.x === 1) { // Moving right
+                        ctx.beginPath();
+                        ctx.arc(headCenterX + 8, headCenterY, smileRadius, -Math.PI / 2, Math.PI / 2);
+                        ctx.stroke();
+                    } else if (direction.x === -1) { // Moving left
+                        ctx.beginPath();
+                        ctx.arc(headCenterX - 8, headCenterY, smileRadius, Math.PI / 2, -Math.PI / 2);
+                        ctx.stroke();
+                    } else if (direction.y === -1) { // Moving up
+                        ctx.beginPath();
+                        ctx.arc(headCenterX, headCenterY - 8, smileRadius, 0, Math.PI);
+                        ctx.stroke();
+                    } else if (direction.y === 1) { // Moving down
+                        ctx.beginPath();
+                        ctx.arc(headCenterX, headCenterY + 8, smileRadius, Math.PI, 0);
+                        ctx.stroke();
+                    }
+                } else {
+                    // Body - smooth rainbow gradient with rounded corners
+                    ctx.fillStyle = hslToRgb(hue, 1, 0.5);
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+                    ctx.shadowBlur = 5;
+                    
+                    const bodyX = segment.x * gridSize + 1;
+                    const bodyY = segment.y * gridSize + 1;
+                    const bodyW = gridSize - 2;
+                    const bodyH = gridSize - 2;
+                    const bodyRadius = 4;
+                    
+                    // Draw rounded rectangle for body
+                    ctx.beginPath();
+                    ctx.moveTo(bodyX + bodyRadius, bodyY);
+                    ctx.lineTo(bodyX + bodyW - bodyRadius, bodyY);
+                    ctx.quadraticCurveTo(bodyX + bodyW, bodyY, bodyX + bodyW, bodyY + bodyRadius);
+                    ctx.lineTo(bodyX + bodyW, bodyY + bodyH - bodyRadius);
+                    ctx.quadraticCurveTo(bodyX + bodyW, bodyY + bodyH, bodyX + bodyW - bodyRadius, bodyY + bodyH);
+                    ctx.lineTo(bodyX + bodyRadius, bodyY + bodyH);
+                    ctx.quadraticCurveTo(bodyX, bodyY + bodyH, bodyX, bodyY + bodyH - bodyRadius);
+                    ctx.lineTo(bodyX, bodyY + bodyRadius);
+                    ctx.quadraticCurveTo(bodyX, bodyY, bodyX + bodyRadius, bodyY);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Add subtle highlight to body
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                    ctx.beginPath();
+                    ctx.arc(bodyX + 4, bodyY + 4, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Draw border
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(bodyX + bodyRadius, bodyY);
+                    ctx.lineTo(bodyX + bodyW - bodyRadius, bodyY);
+                    ctx.quadraticCurveTo(bodyX + bodyW, bodyY, bodyX + bodyW, bodyY + bodyRadius);
+                    ctx.lineTo(bodyX + bodyW, bodyY + bodyH - bodyRadius);
+                    ctx.quadraticCurveTo(bodyX + bodyW, bodyY + bodyH, bodyX + bodyW - bodyRadius, bodyY + bodyH);
+                    ctx.lineTo(bodyX + bodyRadius, bodyY + bodyH);
+                    ctx.quadraticCurveTo(bodyX, bodyY + bodyH, bodyX, bodyY + bodyH - bodyRadius);
+                    ctx.lineTo(bodyX, bodyY + bodyRadius);
+                    ctx.quadraticCurveTo(bodyX, bodyY, bodyX + bodyRadius, bodyY);
+                    ctx.closePath();
+                    ctx.stroke();
                 }
-                ctx.fillRect(
-                    segment.x * gridSize + 1,
-                    segment.y * gridSize + 1,
-                    gridSize - 2,
-                    gridSize - 2
-                );
             });
 
-            // Draw food
-            ctx.fillStyle = '#FF6B6B';
-            ctx.shadowColor = '#E63946';
-            ctx.shadowBlur = 8;
-            ctx.beginPath();
-            ctx.arc(
-                food.x * gridSize + gridSize / 2,
-                food.y * gridSize + gridSize / 2,
-                gridSize / 2 - 2,
-                0,
-                Math.PI * 2
-            );
-            ctx.fill();
+            // Draw food as apple - disable all shadow effects
             ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.globalAlpha = 1;
+            ctx.filter = 'none';
+            ctx.font = `${gridSize - 4}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#000000';
+            ctx.fillText('🍎', 
+                food.x * gridSize + gridSize / 2,
+                food.y * gridSize + gridSize / 2
+            );
         }
 
         // Update game state
@@ -644,6 +1195,7 @@
             if (newHead.x === food.x && newHead.y === food.y) {
                 score += 10;
                 document.getElementById('score').textContent = score;
+                smileFrames = 10; // Show smile for 10 frames
                 food = generateFood();
             } else {
                 // Remove tail if no food eaten
@@ -655,8 +1207,14 @@
         function gameLoop() {
             if (!gamePaused) {
                 update();
+                gameFrameCount++;
             }
             draw();
+            
+            // Decrement smile frames
+            if (smileFrames > 0) {
+                smileFrames--;
+            }
         }
 
         // Start game
@@ -668,13 +1226,14 @@
                 direction = { x: 1, y: 0 };
                 nextDirection = { x: 1, y: 0 };
                 score = 0;
+                gameFrameCount = 0;
                 food = generateFood();
                 document.getElementById('score').textContent = score;
                 document.getElementById('gameOver').classList.remove('show');
                 document.getElementById('startBtn').textContent = 'Restart';
                 
                 if (!gameLoopId) {
-                    gameLoopId = setInterval(gameLoop, 100);
+                    gameLoopId = setInterval(gameLoop, difficultySettings[difficulty]);
                 }
             }
         }
