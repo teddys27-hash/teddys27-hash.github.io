@@ -257,6 +257,47 @@
             color: #333;
         }
 
+        .mobile-controls {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .mobile-controls.show {
+            display: grid;
+        }
+
+        .control-btn {
+            padding: 15px;
+            font-size: 24px;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .control-btn:active {
+            background-color: #764ba2;
+            transform: scale(0.95);
+        }
+
+        .control-btn.up { grid-column: 2; }
+        .control-btn.left { grid-column: 1; grid-row: 2; }
+        .control-btn.down { grid-column: 2; grid-row: 2; }
+        .control-btn.right { grid-column: 3; grid-row: 2; }
+
         @media (max-width: 640px) {
             .logo {
                 font-size: 54px;
@@ -291,6 +332,47 @@
                 width: 50px;
                 height: 50px;
                 font-size: 26px;
+            }
+
+            .game-modal-content {
+                width: 95vw;
+                padding: 15px;
+            }
+
+            #gameCanvas {
+                width: 100% !important;
+                height: auto !important;
+                max-width: 400px;
+            }
+
+            .game-container h1 {
+                font-size: 1.8em;
+            }
+
+            .info {
+                flex-direction: column;
+                gap: 10px;
+                font-size: 1em;
+            }
+
+            .controls {
+                font-size: 0.85em;
+            }
+
+            .controls p {
+                margin: 5px 0;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group button {
+                width: 100%;
+            }
+
+            .mobile-controls.show {
+                display: grid;
             }
         }
     </style>
@@ -364,6 +446,12 @@
                     <button id="startBtn">Start Game</button>
                     <button id="pauseBtn">Pause</button>
                 </div>
+                <div class="mobile-controls" id="mobileControls">
+                    <button class="control-btn up" ontouchstart="handleMobileMove('up')">🔼</button>
+                    <button class="control-btn left" ontouchstart="handleMobileMove('left')">◀️</button>
+                    <button class="control-btn down" ontouchstart="handleMobileMove('down')">🔽</button>
+                    <button class="control-btn right" ontouchstart="handleMobileMove('right')">▶️</button>
+                </div>
             </div>
 
             <div class="game-over" id="gameOver">
@@ -422,7 +510,35 @@
                 gameVariablesInitialized = true;
             }
             document.getElementById('highScore').textContent = highScore;
+            
+            // Show mobile controls on mobile devices
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const mobileControls = document.getElementById('mobileControls');
+            if (isMobile && mobileControls) {
+                mobileControls.classList.add('show');
+            }
+            
             draw();
+        }
+
+        // Mobile touch controls
+        function handleMobileMove(direction) {
+            if (!gameRunning && !gamePaused) return;
+            
+            switch(direction) {
+                case 'up':
+                    if (nextDirection.y === 0) nextDirection = { x: 0, y: -1 };
+                    break;
+                case 'down':
+                    if (nextDirection.y === 0) nextDirection = { x: 0, y: 1 };
+                    break;
+                case 'left':
+                    if (nextDirection.x === 0) nextDirection = { x: -1, y: 0 };
+                    break;
+                case 'right':
+                    if (nextDirection.x === 0) nextDirection = { x: 1, y: 0 };
+                    break;
+            }
         }
 
         // Generate random food position
