@@ -188,6 +188,75 @@
             text-decoration: underline;
         }
 
+        .snake-icon {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .snake-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .snake-icon:active {
+            transform: scale(0.95);
+        }
+
+        .game-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        .game-modal.show {
+            display: flex;
+        }
+
+        .game-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-game {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-game:hover {
+            color: #333;
+        }
+
         @media (max-width: 640px) {
             .logo {
                 font-size: 54px;
@@ -214,6 +283,14 @@
                 gap: 15px;
                 flex-direction: column;
                 font-size: 12px;
+            }
+
+            .snake-icon {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 26px;
             }
         }
     </style>
@@ -265,35 +342,301 @@
         </div>
     </div>
 
+    <!-- Snake Game Icon -->
+    <div class="snake-icon" onclick="openGameModal()">🐍</div>
+
+    <!-- Game Modal -->
+    <div class="game-modal" id="gameModal">
+        <div class="game-modal-content">
+            <button class="close-game" onclick="closeGameModal()">✕</button>
+            <div class="game-container">
+                <h1>🐍 Snake Game</h1>
+                <div class="info">
+                    <div class="score">Score: <span id="score">0</span></div>
+                    <div class="high-score">High Score: <span id="highScore">0</span></div>
+                </div>
+                <canvas id="gameCanvas" width="400" height="400"></canvas>
+                <div class="controls">
+                    <p>Use Arrow Keys or WASD to move</p>
+                    <p>Press Space to pause/resume</p>
+                </div>
+                <div class="button-group">
+                    <button id="startBtn">Start Game</button>
+                    <button id="pauseBtn">Pause</button>
+                </div>
+            </div>
+
+            <div class="game-over" id="gameOver">
+                <div class="game-over-content">
+                    <h2>Game Over!</h2>
+                    <div class="final-score">Final Score: <span id="finalScore">0</span></div>
+                    <button onclick="location.reload()">Play Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        function handleSearch(event) {
-            if (event) {
-                event.preventDefault();
-            }
-            const query = document.getElementById('searchInput').value.trim();
-            if (query) {
-                window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        // Game Modal Functions
+        function openGameModal() {
+            document.getElementById('gameModal').classList.add('show');
+            initializeGame();
+        }
+
+        function closeGameModal() {
+            document.getElementById('gameModal').classList.remove('show');
+            if (gameRunning) {
+                endGame();
             }
         }
 
-        function handleLuckySearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            if (query) {
-                window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}&btnI=lucky`;
+        // Close modal when clicking outside content
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('gameModal');
+            if (e.target === modal) {
+                closeGameModal();
+            }
+        });
+
+        let canvas, ctx;
+        let gameVariablesInitialized = false;
+
+        // Game variables
+        const gridSize = 20;
+        let tileCount;
+        let snake = [{ x: 10, y: 10 }];
+        let food = { x: 15, y: 15 };
+        let direction = { x: 1, y: 0 };
+        let nextDirection = { x: 1, y: 0 };
+        let score = 0;
+        let gameRunning = false;
+        let gamePaused = false;
+        let gameLoopId = null;
+        let highScore = localStorage.getItem('snakeHighScore') || 0;
+
+        function initializeGame() {
+            if (!gameVariablesInitialized) {
+                canvas = document.getElementById('gameCanvas');
+                ctx = canvas.getContext('2d');
+                tileCount = canvas.width / gridSize;
+                gameVariablesInitialized = true;
+            }
+            document.getElementById('highScore').textContent = highScore;
+            draw();
+        }
+
+        // Generate random food position
+        function generateFood() {
+            let newFood;
+            let validPosition = false;
+            while (!validPosition) {
+                newFood = {
+                    x: Math.floor(Math.random() * tileCount),
+                    y: Math.floor(Math.random() * tileCount)
+                };
+                validPosition = !snake.some(segment => segment.x === newFood.x && segment.y === newFood.y);
+            }
+            return newFood;
+        }
+
+        // Draw game
+        function draw() {
+            if (!canvas) return;
+            
+            // Clear canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw grid (optional - light grid)
+            ctx.strokeStyle = '#111';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i <= tileCount; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * gridSize, 0);
+                ctx.lineTo(i * gridSize, canvas.height);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(0, i * gridSize);
+                ctx.lineTo(canvas.width, i * gridSize);
+                ctx.stroke();
+            }
+
+            // Draw snake
+            snake.forEach((segment, index) => {
+                if (index === 0) {
+                    // Head
+                    ctx.fillStyle = '#4CAF50';
+                    ctx.shadowColor = '#2E7D32';
+                    ctx.shadowBlur = 10;
+                } else {
+                    // Body
+                    ctx.fillStyle = '#66BB6A';
+                    ctx.shadowColor = 'transparent';
+                }
+                ctx.fillRect(
+                    segment.x * gridSize + 1,
+                    segment.y * gridSize + 1,
+                    gridSize - 2,
+                    gridSize - 2
+                );
+            });
+
+            // Draw food
+            ctx.fillStyle = '#FF6B6B';
+            ctx.shadowColor = '#E63946';
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(
+                food.x * gridSize + gridSize / 2,
+                food.y * gridSize + gridSize / 2,
+                gridSize / 2 - 2,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+            ctx.shadowColor = 'transparent';
+        }
+
+        // Update game state
+        function update() {
+            direction = nextDirection;
+
+            // Calculate new head position
+            const head = snake[0];
+            const newHead = {
+                x: head.x + direction.x,
+                y: head.y + direction.y
+            };
+
+            // Check collision with walls
+            if (newHead.x < 0 || newHead.x >= tileCount || newHead.y < 0 || newHead.y >= tileCount) {
+                endGame();
+                return;
+            }
+
+            // Check collision with self
+            if (snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
+                endGame();
+                return;
+            }
+
+            // Add new head
+            snake.unshift(newHead);
+
+            // Check if food is eaten
+            if (newHead.x === food.x && newHead.y === food.y) {
+                score += 10;
+                document.getElementById('score').textContent = score;
+                food = generateFood();
+            } else {
+                // Remove tail if no food eaten
+                snake.pop();
             }
         }
 
-        // Focus search input on page load
+        // Game loop
+        function gameLoop() {
+            if (!gamePaused) {
+                update();
+            }
+            draw();
+        }
+
+        // Start game
+        function startGame() {
+            if (!gameRunning) {
+                gameRunning = true;
+                gamePaused = false;
+                snake = [{ x: 10, y: 10 }];
+                direction = { x: 1, y: 0 };
+                nextDirection = { x: 1, y: 0 };
+                score = 0;
+                food = generateFood();
+                document.getElementById('score').textContent = score;
+                document.getElementById('gameOver').classList.remove('show');
+                document.getElementById('startBtn').textContent = 'Restart';
+                
+                if (!gameLoopId) {
+                    gameLoopId = setInterval(gameLoop, 100);
+                }
+            }
+        }
+
+        // Pause game
+        function togglePause() {
+            if (gameRunning) {
+                gamePaused = !gamePaused;
+                document.getElementById('pauseBtn').textContent = gamePaused ? 'Resume' : 'Pause';
+            }
+        }
+
+        // End game
+        function endGame() {
+            gameRunning = false;
+            clearInterval(gameLoopId);
+            gameLoopId = null;
+
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('snakeHighScore', highScore);
+                document.getElementById('highScore').textContent = highScore;
+            }
+
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameOver').classList.add('show');
+            document.getElementById('pauseBtn').textContent = 'Pause';
+        }
+
+        // Handle keyboard input
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning && !gamePaused) return;
+
+            const key = e.key.toLowerCase();
+
+            switch (key) {
+                case 'arrowup':
+                case 'w':
+                    e.preventDefault();
+                    if (direction.y === 0) nextDirection = { x: 0, y: -1 };
+                    break;
+                case 'arrowdown':
+                case 's':
+                    e.preventDefault();
+                    if (direction.y === 0) nextDirection = { x: 0, y: 1 };
+                    break;
+                case 'arrowleft':
+                case 'a':
+                    e.preventDefault();
+                    if (direction.x === 0) nextDirection = { x: -1, y: 0 };
+                    break;
+                case 'arrowright':
+                case 'd':
+                    e.preventDefault();
+                    if (direction.x === 0) nextDirection = { x: 1, y: 0 };
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    togglePause();
+                    break;
+            }
+        });
+
+        // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('searchInput').focus();
+            const startBtn = document.getElementById('startBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            
+            if (startBtn) startBtn.addEventListener('click', startGame);
+            if (pauseBtn) pauseBtn.addEventListener('click', togglePause);
         });
 
-        // Allow Enter key to search
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                handleSearch();
-            }
-        });
+        // Fallback for event listeners if DOM is already loaded
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        
+        if (startBtn) startBtn.addEventListener('click', startGame);
+        if (pauseBtn) pauseBtn.addEventListener('click', togglePause);
     </script>
 </body>
 </html>
