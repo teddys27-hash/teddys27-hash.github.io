@@ -749,11 +749,22 @@
 
             <!-- Difficulty Settings Menu -->
             <div class="difficulty-menu" id="difficultyMenu">
+                <h2>Choose Difficulty</h2>
+                <div class="difficulty-options">
+                    <button class="difficulty-option selected" onclick="startGameWithDifficulty('easy')">🐍 Easy</button>
+                    <button class="difficulty-option" onclick="startGameWithDifficulty('medium')">💛 Medium</button>
+                    <button class="difficulty-option" onclick="startGameWithDifficulty('hard')">❤️ Hard</button>
+                </div>
+                <button class="menu-btn back-btn" onclick="backToMainMenu()">← Back</button>
+            </div>
+
+            <!-- Skins Menu -->
+            <div class="difficulty-menu" id="skinsMenu">
                 <h2>Choose a Skin</h2>
                 <div class="difficulty-options">
-                    <button class="difficulty-option selected" onclick="setDifficultyAndBack('easy')">🐍 Rainbow</button>
-                    <button class="difficulty-option" onclick="setDifficultyAndBack('medium')">💚 Green</button>
-                    <button class="difficulty-option" onclick="setDifficultyAndBack('hard')">🔵 Blue</button>
+                    <button class="difficulty-option selected" onclick="setSkin('easy')">🐍 Rainbow</button>
+                    <button class="difficulty-option" onclick="setSkin('medium')">💚 Green</button>
+                    <button class="difficulty-option" onclick="setSkin('hard')">🔵 Blue</button>
                 </div>
                 <button class="menu-btn back-btn" onclick="backToMainMenu()">← Back</button>
             </div>
@@ -800,6 +811,19 @@
         // Menu Functions
         function startGameFromMenu() {
             document.getElementById('gameMenu').classList.remove('show');
+            document.getElementById('difficultyMenu').classList.add('show');
+        }
+
+        function startGameWithDifficulty(level) {
+            difficulty = level;
+            // Update button styling
+            document.querySelectorAll('.difficulty-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // Hide difficulty menu and start game
+            document.getElementById('difficultyMenu').classList.remove('show');
             document.getElementById('gameContainer').style.display = 'block';
             initializeGame();
             startGame();
@@ -807,11 +831,22 @@
 
         function showSettingsMenu() {
             document.getElementById('gameMenu').classList.remove('show');
-            document.getElementById('difficultyMenu').classList.add('show');
+            document.getElementById('skinsMenu').classList.add('show');
+        }
+
+        function setSkin(skinType) {
+            gameSkin = skinType;
+            // Update button styling
+            document.querySelectorAll('#skinsMenu .difficulty-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            // Skins can be expanded here in the future for different snake colors
         }
 
         function backToMainMenu() {
             document.getElementById('difficultyMenu').classList.remove('show');
+            document.getElementById('skinsMenu').classList.remove('show');
             document.getElementById('gameMenu').classList.add('show');
         }
 
@@ -819,6 +854,13 @@
             if (gameRunning) {
                 endGame();
             }
+            // Show UI elements again when returning to menu
+            document.querySelector('.game-container h1').style.display = 'block';
+            document.querySelector('.game-container .info').style.display = 'flex';
+            document.querySelector('.game-container .controls').style.display = 'block';
+            document.querySelector('.game-container .difficulty-selector').style.display = 'flex';
+            document.querySelector('.game-container .button-group').style.display = 'flex';
+            
             document.getElementById('gameContainer').style.display = 'none';
             document.getElementById('gameOver').classList.remove('show');
             document.getElementById('gameMenu').classList.add('show');
@@ -873,7 +915,7 @@
         // Game variables
         const gridSize = 30;
         let tileCount;
-        let snake = [{ x: 10, y: 10 }];
+        let snake = [];  // Will be initialized when game starts
         let food = { x: 15, y: 15 };
         let direction = { x: 1, y: 0 };
         let nextDirection = { x: 1, y: 0 };
@@ -883,6 +925,7 @@
         let gameLoopId = null;
         let highScore = localStorage.getItem('snakeHighScore') || 0;
         let difficulty = 'easy';
+        let gameSkin = 'easy';  // 'easy' = rainbow, 'medium' = green, 'hard' = blue
         let gameFrameCount = 0;
         let smileFrames = 0;
         
@@ -995,10 +1038,26 @@
                 // Calculate rainbow hue based on position in snake (0-360)
                 const hue = (index / snake.length * 360) % 360;
                 
+                // Determine color based on skin type
+                let segmentColor, shadowColor;
+                if (gameSkin === 'easy') {
+                    // Rainbow skin - use hue-based colors
+                    segmentColor = hslToRgb(hue, 1, 0.5);
+                    shadowColor = hslToRgb(hue, 1, 0.3);
+                } else if (gameSkin === 'medium') {
+                    // Green skin - whole snake is green
+                    segmentColor = '#00DD00';
+                    shadowColor = '#008800';
+                } else if (gameSkin === 'hard') {
+                    // Blue skin - whole snake is blue
+                    segmentColor = '#0066FF';
+                    shadowColor = '#003399';
+                }
+                
                 if (index === 0) {
                     // Head - bright color with rounded corners
-                    ctx.fillStyle = hslToRgb(hue, 1, 0.5);
-                    ctx.shadowColor = hslToRgb(hue, 1, 0.3);
+                    ctx.fillStyle = segmentColor;
+                    ctx.shadowColor = shadowColor;
                     ctx.shadowBlur = 15;
                     const headX = segment.x * gridSize + 1;
                     const headY = segment.y * gridSize + 1;
@@ -1151,8 +1210,8 @@
                         ctx.stroke();
                     }
                 } else {
-                    // Body - smooth rainbow gradient with rounded corners
-                    ctx.fillStyle = hslToRgb(hue, 1, 0.5);
+                    // Body - smooth gradient with rounded corners
+                    ctx.fillStyle = segmentColor;
                     ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
                     ctx.shadowBlur = 5;
                     
@@ -1274,7 +1333,10 @@
             if (!gameRunning) {
                 gameRunning = true;
                 gamePaused = false;
-                snake = [{ x: 10, y: 10 }];
+                // Start snake in the middle of the board
+                const middleX = Math.floor(tileCount / 2);
+                const middleY = Math.floor(tileCount / 2);
+                snake = [{ x: middleX, y: middleY }];
                 direction = { x: 1, y: 0 };
                 nextDirection = { x: 1, y: 0 };
                 score = 0;
@@ -1283,6 +1345,13 @@
                 document.getElementById('score').textContent = score;
                 document.getElementById('gameOver').classList.remove('show');
                 document.getElementById('startBtn').textContent = 'Restart';
+                
+                // Hide UI elements during game
+                document.querySelector('.game-container h1').style.display = 'none';
+                document.querySelector('.game-container .info').style.display = 'none';
+                document.querySelector('.game-container .controls').style.display = 'none';
+                document.querySelector('.game-container .difficulty-selector').style.display = 'none';
+                document.querySelector('.game-container .button-group').style.display = 'none';
                 
                 if (!gameLoopId) {
                     gameLoopId = setInterval(gameLoop, difficultySettings[difficulty]);
