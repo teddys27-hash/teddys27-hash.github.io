@@ -601,13 +601,22 @@
 
             .game-modal-content {
                 width: 95vw;
+                max-height: 95vh;
                 padding: 15px;
+                overflow-y: auto;
             }
 
             #gameCanvas {
                 width: 100% !important;
                 height: auto !important;
                 max-width: 400px;
+                aspect-ratio: 1 / 1;
+                image-rendering: pixelated;
+                image-rendering: crisp-edges;
+            }
+
+            .game-container {
+                padding-bottom: 80px;
             }
 
             .game-container h1 {
@@ -622,19 +631,48 @@
 
             .controls {
                 font-size: 0.85em;
+                display: none;
             }
 
             .controls p {
                 margin: 5px 0;
             }
 
+            .mobile-controls {
+                width: 100%;
+                max-width: 280px;
+                margin: 15px auto 0;
+            }
+
+            .control-btn {
+                min-height: 50px;
+                min-width: 50px;
+                font-size: 28px;
+            }
+
+            .difficulty-selector {
+                flex-direction: row;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .difficulty-btn {
+                padding: 8px 12px;
+                font-size: 0.85em;
+            }
+
             .button-group {
                 flex-direction: column;
+                gap: 10px;
             }
 
             .button-group button {
-                width: 100%;
+                width: 90%;
+                max-width: 300px;
+                padding: 12px 20px;
+                font-size: 0.95em;
             }
+
 
             .mobile-controls.show {
                 display: grid;
@@ -859,6 +897,20 @@
             if (!gameVariablesInitialized) {
                 canvas = document.getElementById('gameCanvas');
                 ctx = canvas.getContext('2d');
+                
+                // Make canvas responsive on mobile
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                
+                if (isMobile) {
+                    // For mobile, scale down the game board slightly to fit better
+                    const maxCanvasSize = Math.min(window.innerWidth - 40, 340);
+                    canvas.width = maxCanvasSize;
+                    canvas.height = maxCanvasSize;
+                } else {
+                    canvas.width = 420;
+                    canvas.height = 420;
+                }
+                
                 tileCount = canvas.width / gridSize;
                 gameVariablesInitialized = true;
             }
@@ -1312,6 +1364,81 @@
         
         if (startBtn) startBtn.addEventListener('click', startGame);
         if (pauseBtn) pauseBtn.addEventListener('click', togglePause);
+
+        // Search functionality
+        function handleSearch(event) {
+            if (event) {
+                event.preventDefault();
+            }
+            const searchInput = document.getElementById('searchInput');
+            const query = searchInput.value.trim();
+            
+            if (!query) {
+                return;
+            }
+            
+            // Check if input is a URL
+            if (isValidURL(query)) {
+                window.location.href = query;
+            } else {
+                // Perform a Google search
+                window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+            }
+        }
+
+        function handleLuckySearch() {
+            const searchInput = document.getElementById('searchInput');
+            const query = searchInput.value.trim();
+            
+            if (!query) {
+                return;
+            }
+            
+            // Check if input is a URL
+            if (isValidURL(query)) {
+                window.location.href = query;
+            } else {
+                // Perform a Google Lucky Search
+                window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(query) + '&btnI=true';
+            }
+        }
+
+        function isValidURL(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // Mobile touch controls
+        function handleMobileMove(direction) {
+            if (!gameRunning || gamePaused) return;
+            
+            switch (direction) {
+                case 'up':
+                    if (direction_y === 0) nextDirection = { x: 0, y: -1 };
+                    break;
+                case 'down':
+                    if (direction_y === 0) nextDirection = { x: 0, y: 1 };
+                    break;
+                case 'left':
+                    if (direction_x === 0) nextDirection = { x: -1, y: 0 };
+                    break;
+                case 'right':
+                    if (direction_x === 0) nextDirection = { x: 1, y: 0 };
+                    break;
+            }
+        }
+
+        // Fix variable names in handleMobileMove
+        Object.defineProperty(window, 'direction_x', {
+            get: function() { return direction.x; }
+        });
+        Object.defineProperty(window, 'direction_y', {
+            get: function() { return direction.y; }
+        });
     </script>
 </body>
 </html>
