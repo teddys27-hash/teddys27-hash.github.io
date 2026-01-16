@@ -215,6 +215,33 @@
             transform: scale(0.95);
         }
 
+        .dinosaur-icon {
+            position: fixed;
+            bottom: 30px;
+            right: 100px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #FF0000 0%, #000000 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .dinosaur-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 0, 0, 0.6);
+        }
+
+        .dinosaur-icon:active {
+            transform: scale(0.95);
+        }
+
         .game-modal {
             display: none;
             position: fixed;
@@ -599,6 +626,14 @@
                 font-size: 26px;
             }
 
+            .dinosaur-icon {
+                bottom: 20px;
+                right: 80px;
+                width: 50px;
+                height: 50px;
+                font-size: 26px;
+            }
+
             .game-modal-content {
                 width: 95vw;
                 max-height: 95vh;
@@ -730,6 +765,12 @@
     <!-- Snake Game Icon -->
     <div class="snake-icon" onclick="openGameModal()">🐍</div>
 
+    <!-- Dinosaur Game Icon -->
+    <div class="dinosaur-icon" onclick="openDinosaurModal()">🦖</div>
+
+    <!-- Tetris Game Icon -->
+    <div class="tetris-icon" onclick="openTetrisModal()">🧱</div>
+
     <!-- Game Modal -->
     <div class="game-modal" id="gameModal">
         <div class="game-modal-content">
@@ -802,6 +843,49 @@
                     <h2>Game Over!</h2>
                     <div class="final-score">Final Score: <span id="finalScore">0</span></div>
                     <button onclick="returnToMainMenu()">Play Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dinosaur Game Modal -->
+    <div class="game-modal" id="dinosaurModal">
+        <div class="game-modal-content">
+            <button class="close-game" onclick="closeDinosaurModal()">✕</button>
+            
+            <!-- Game Menu -->
+            <div class="game-menu show" id="dinosaurMenu">
+                <h1>🦖 Dinosaur Game</h1>
+                <div style="font-size: 1.2em; color: #667eea; margin: 20px 0; font-weight: bold;">
+                    🏆 High Score: <span id="dinosaurHighScoreDisplay">0</span>
+                </div>
+                <div class="menu-buttons">
+                    <button class="menu-btn" onclick="startDinosaurGame()">▶ Play</button>
+                </div>
+            </div>
+
+            <div class="game-container" id="dinosaurContainer" style="display: none;">
+                <h1>🦖 Dinosaur Game</h1>
+                <div class="info">
+                    <div class="score">Score: <span id="dinosaurScore">0</span></div>
+                    <div class="high-score">High Score: <span id="dinosaurHighScore">0</span></div>
+                </div>
+                <canvas id="dinosaurCanvas" width="800" height="200"></canvas>
+                <div class="controls">
+                    <p>Press SPACE or UP ARROW to jump</p>
+                    <p>Avoid the cacti!</p>
+                </div>
+                <div class="button-group">
+                    <button id="dinosaurStartBtn">Start Game</button>
+                    <button id="dinosaurPauseBtn">Pause</button>
+                </div>
+            </div>
+
+            <div class="game-over" id="dinosaurGameOver">
+                <div class="game-over-content">
+                    <h2>Game Over!</h2>
+                    <div class="final-score">Final Score: <span id="dinosaurFinalScore">0</span></div>
+                    <button onclick="returnToDinosaurMenu()">Play Again</button>
                 </div>
             </div>
         </div>
@@ -1508,6 +1592,290 @@
         Object.defineProperty(window, 'direction_y', {
             get: function() { return direction.y; }
         });
+
+        // ========== DINOSAUR GAME ==========
+        let dinosaurCanvas, dinosaurCtx;
+        let dinosaurGameRunning = false;
+        let dinosaurGamePaused = false;
+        let dinosaurGameLoopId = null;
+        let dinosaurScore = 0;
+        let dinosaurHighScore = localStorage.getItem('dinosaurHighScore') || 0;
+        let dinosaurVariablesInitialized = false;
+
+        // Dinosaur object
+        let dino = {
+            x: 50,
+            y: 0,
+            width: 40,
+            height: 40,
+            velocityY: 0,
+            jumping: false,
+            color: '#8B4513'
+        };
+
+        // Obstacles (cacti)
+        let cacti = [];
+        let cactusSpeed = 8;
+        let frameCount = 0;
+
+        // Dinosaur game constants
+        const GRAVITY = 0.6;
+        const JUMP_POWER = -15;
+        const GROUND_LEVEL = 150;
+
+        function openDinosaurModal() {
+            document.getElementById('dinosaurModal').classList.add('show');
+            document.getElementById('dinosaurHighScoreDisplay').textContent = dinosaurHighScore;
+            document.getElementById('dinosaurGameOver').classList.remove('show');
+        }
+
+        function closeDinosaurModal() {
+            document.getElementById('dinosaurModal').classList.remove('show');
+            if (dinosaurGameRunning) {
+                endDinosaurGame();
+            }
+            document.getElementById('dinosaurContainer').style.display = 'none';
+            document.getElementById('dinosaurMenu').classList.add('show');
+            document.getElementById('dinosaurGameOver').classList.remove('show');
+        }
+
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('dinosaurModal');
+            if (e.target === modal) {
+                closeDinosaurModal();
+            }
+        });
+
+        function startDinosaurGame() {
+            document.getElementById('dinosaurMenu').classList.remove('show');
+            document.getElementById('dinosaurContainer').style.display = 'block';
+            initializeDinosaurGame();
+            playDinosaurGame();
+        }
+
+        function initializeDinosaurGame() {
+            if (!dinosaurVariablesInitialized) {
+                dinosaurCanvas = document.getElementById('dinosaurCanvas');
+                dinosaurCtx = dinosaurCanvas.getContext('2d');
+                dinosaurVariablesInitialized = true;
+            }
+            
+            // Reset dino position
+            dino.y = GROUND_LEVEL;
+            dino.velocityY = 0;
+            dino.jumping = false;
+            
+            document.getElementById('dinosaurHighScore').textContent = dinosaurHighScore;
+        }
+
+        function playDinosaurGame() {
+            if (!dinosaurGameRunning) {
+                dinosaurGameRunning = true;
+                dinosaurGamePaused = false;
+                dinosaurScore = 0;
+                cacti = [];
+                frameCount = 0;
+                cactusSpeed = 8;
+                
+                document.getElementById('dinosaurScore').textContent = dinosaurScore;
+                document.getElementById('dinosaurGameOver').classList.remove('show');
+                
+                // Hide UI elements during game
+                document.querySelector('#dinosaurContainer h1').style.display = 'none';
+                document.querySelector('#dinosaurContainer .info').style.display = 'none';
+                document.querySelector('#dinosaurContainer .controls').style.display = 'none';
+                document.querySelector('#dinosaurContainer .button-group').style.display = 'none';
+                
+                if (!dinosaurGameLoopId) {
+                    dinosaurGameLoopId = setInterval(dinosaurGameLoop, 30);
+                }
+            }
+        }
+
+        function dinosaurGameLoop() {
+            if (!dinosaurGamePaused) {
+                updateDinosaurGame();
+            }
+            drawDinosaurGame();
+        }
+
+        function updateDinosaurGame() {
+            // Update dino gravity and jump
+            dino.velocityY += GRAVITY;
+            dino.y += dino.velocityY;
+
+            if (dino.y >= GROUND_LEVEL) {
+                dino.y = GROUND_LEVEL;
+                dino.jumping = false;
+                dino.velocityY = 0;
+            }
+
+            // Spawn cacti
+            frameCount++;
+            if (frameCount % 100 === 0) {
+                cacti.push({
+                    x: dinosaurCanvas.width,
+                    y: GROUND_LEVEL,
+                    width: 20,
+                    height: 40,
+                    color: '#228B22'
+                });
+            }
+
+            // Update cacti
+            for (let i = 0; i < cacti.length; i++) {
+                cacti[i].x -= cactusSpeed;
+
+                // Check collision
+                if (checkDinosaurCollision(dino, cacti[i])) {
+                    endDinosaurGame();
+                    return;
+                }
+
+                // Remove off-screen cacti and increase score
+                if (cacti[i].x + cacti[i].width < 0) {
+                    cacti.splice(i, 1);
+                    dinosaurScore += 10;
+                    document.getElementById('dinosaurScore').textContent = dinosaurScore;
+                    
+                    // Increase difficulty
+                    if (dinosaurScore % 100 === 0) {
+                        cactusSpeed += 1;
+                    }
+                }
+            }
+        }
+
+        function checkDinosaurCollision(dino, cactus) {
+            return dino.x < cactus.x + cactus.width &&
+                   dino.x + dino.width > cactus.x &&
+                   dino.y < cactus.y + cactus.height &&
+                   dino.y + dino.height > cactus.y;
+        }
+
+        function drawDinosaurGame() {
+            if (!dinosaurCanvas) return;
+
+            // Clear canvas with sky gradient
+            const gradient = dinosaurCtx.createLinearGradient(0, 0, 0, dinosaurCanvas.height);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(1, '#E0F6FF');
+            dinosaurCtx.fillStyle = gradient;
+            dinosaurCtx.fillRect(0, 0, dinosaurCanvas.width, dinosaurCanvas.height);
+
+            // Draw ground
+            dinosaurCtx.fillStyle = '#90EE90';
+            dinosaurCtx.fillRect(0, GROUND_LEVEL + 40, dinosaurCanvas.width, 20);
+
+            // Draw ground line
+            dinosaurCtx.strokeStyle = '#228B22';
+            dinosaurCtx.lineWidth = 2;
+            dinosaurCtx.beginPath();
+            dinosaurCtx.moveTo(0, GROUND_LEVEL + 40);
+            dinosaurCtx.lineTo(dinosaurCanvas.width, GROUND_LEVEL + 40);
+            dinosaurCtx.stroke();
+
+            // Draw dino
+            dinosaurCtx.fillStyle = dino.color;
+            dinosaurCtx.fillRect(dino.x, dino.y, dino.width, dino.height);
+            
+            // Draw dino head
+            dinosaurCtx.beginPath();
+            dinosaurCtx.arc(dino.x + 30, dino.y + 10, 8, 0, Math.PI * 2);
+            dinosaurCtx.fill();
+            
+            // Draw dino eyes
+            dinosaurCtx.fillStyle = '#000000';
+            dinosaurCtx.beginPath();
+            dinosaurCtx.arc(dino.x + 33, dino.y + 8, 3, 0, Math.PI * 2);
+            dinosaurCtx.fill();
+
+            // Draw cacti
+            cacti.forEach(cactus => {
+                dinosaurCtx.fillStyle = cactus.color;
+                dinosaurCtx.fillRect(cactus.x, cactus.y, cactus.width, cactus.height);
+                
+                // Add spikes to cactus
+                dinosaurCtx.fillStyle = '#006400';
+                for (let i = 0; i < 3; i++) {
+                    dinosaurCtx.beginPath();
+                    dinosaurCtx.arc(cactus.x + 5, cactus.y + 10 + i * 15, 3, 0, Math.PI * 2);
+                    dinosaurCtx.fill();
+                    dinosaurCtx.beginPath();
+                    dinosaurCtx.arc(cactus.x + 15, cactus.y + 10 + i * 15, 3, 0, Math.PI * 2);
+                    dinosaurCtx.fill();
+                }
+            });
+
+            // Draw score
+            dinosaurCtx.fillStyle = '#000000';
+            dinosaurCtx.font = '20px Arial';
+            dinosaurCtx.fillText('Score: ' + dinosaurScore, 10, 30);
+        }
+
+        function endDinosaurGame() {
+            dinosaurGameRunning = false;
+            clearInterval(dinosaurGameLoopId);
+            dinosaurGameLoopId = null;
+
+            if (dinosaurScore > dinosaurHighScore) {
+                dinosaurHighScore = dinosaurScore;
+                localStorage.setItem('dinosaurHighScore', dinosaurHighScore);
+                document.getElementById('dinosaurHighScore').textContent = dinosaurHighScore;
+            }
+
+            document.getElementById('dinosaurFinalScore').textContent = dinosaurScore;
+            document.getElementById('dinosaurGameOver').classList.add('show');
+        }
+
+        function returnToDinosaurMenu() {
+            // Show UI elements again when returning to menu
+            document.querySelector('#dinosaurContainer h1').style.display = 'block';
+            document.querySelector('#dinosaurContainer .info').style.display = 'flex';
+            document.querySelector('#dinosaurContainer .controls').style.display = 'block';
+            document.querySelector('#dinosaurContainer .button-group').style.display = 'flex';
+
+            document.getElementById('dinosaurContainer').style.display = 'none';
+            document.getElementById('dinosaurGameOver').classList.remove('show');
+            document.getElementById('dinosaurMenu').classList.add('show');
+        }
+
+        // Dinosaur game keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if ((e.code === 'Space' || e.code === 'ArrowUp') && dinosaurGameRunning && !dinosaurGamePaused) {
+                e.preventDefault();
+                if (!dino.jumping) {
+                    dino.velocityY = JUMP_POWER;
+                    dino.jumping = true;
+                }
+            }
+        });
+
+        // Initialize dinosaur game button listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const dinosaurStartBtn = document.getElementById('dinosaurStartBtn');
+            const dinosaurPauseBtn = document.getElementById('dinosaurPauseBtn');
+            
+            if (dinosaurStartBtn) dinosaurStartBtn.addEventListener('click', playDinosaurGame);
+            if (dinosaurPauseBtn) {
+                dinosaurPauseBtn.addEventListener('click', function() {
+                    dinosaurGamePaused = !dinosaurGamePaused;
+                    dinosaurPauseBtn.textContent = dinosaurGamePaused ? 'Resume' : 'Pause';
+                });
+            }
+        });
+
+        // Fallback
+        const dinosaurStartBtn = document.getElementById('dinosaurStartBtn');
+        const dinosaurPauseBtn = document.getElementById('dinosaurPauseBtn');
+        
+        if (dinosaurStartBtn) dinosaurStartBtn.addEventListener('click', playDinosaurGame);
+        if (dinosaurPauseBtn) {
+            dinosaurPauseBtn.addEventListener('click', function() {
+                dinosaurGamePaused = !dinosaurGamePaused;
+                dinosaurPauseBtn.textContent = dinosaurGamePaused ? 'Resume' : 'Pause';
+            });
+        }
     </script>
 </body>
 </html>
